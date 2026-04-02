@@ -1,41 +1,54 @@
-# Compiled Lua sources
-luac.out
+local player = game.Players.LocalPlayer
+local character = player.Character or player.CharacterAdded:Wait()
+local hrp = character:WaitForChild("HumanoidRootPart")
 
-# luarocks build files
-*.src.rock
-*.zip
-*.tar.gz
+local enabled = false
+local funnyModel = nil
 
-# Object files
-*.o
-*.os
-*.ko
-*.obj
-*.elf
+local function createFunnyPart()
+    local model = Instance.new("Model")
+    model.Name = "FunnyPart"
+    model.Parent = character
 
-# Precompiled Headers
-*.gch
-*.pch
+    local leftBall = Instance.new("Part")
+    leftBall.Shape = Enum.PartType.Ball
+    leftBall.Size = Vector3.new(1.5, 1.5, 1.5)
+    leftBall.CanCollide = false
+    leftBall.Material = Enum.Material.SmoothPlastic
+    leftBall.Parent = model
 
-# Libraries
-*.lib
-*.a
-*.la
-*.lo
-*.def
-*.exp
+    local rightBall = leftBall:Clone()
+    rightBall.Parent = model
 
-# Shared objects (inc. Windows DLLs)
-*.dll
-*.so
-*.so.*
-*.dylib
+    local stick = Instance.new("Part")
+    stick.Size = Vector3.new(1.2, 3, 1.2)
+    stick.CanCollide = false
+    stick.Material = Enum.Material.SmoothPlastic
+    stick.Parent = model
 
-# Executables
-*.exe
-*.out
-*.app
-*.i*86
-*.x86_64
-*.hex
+    local function weld(part, pos)
+        part.CFrame = hrp.CFrame * pos
+        local weld = Instance.new("WeldConstraint")
+        weld.Part0 = hrp
+        weld.Part1 = part
+        weld.Parent = part
+    end
 
+    weld(leftBall, CFrame.new(-0.8, -2.7, 0))
+    weld(rightBall, CFrame.new(0.8, -2.7, 0))
+    weld(stick, CFrame.new(0, -1.5, 0))
+
+    return model
+end
+
+-- toggle
+enabled = not enabled
+
+if enabled then
+    funnyModel = createFunnyPart()
+else
+    if funnyModel then
+        funnyModel:Destroy()
+        funnyModel = nil
+    end
+end
